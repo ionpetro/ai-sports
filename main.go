@@ -5,13 +5,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type Response struct {
-	Base64Image string `json:"base64_image"`
-	Context     string `json:"context"`
 	APIResponse string `json:"api_response"`
 }
 
@@ -61,8 +61,6 @@ func HandleHome() http.HandlerFunc {
 			apiResponse := APICall(base64String, context) // Replace with actual API call
 
 			response := Response{
-				Base64Image: base64String,
-				Context:     context,
 				APIResponse: apiResponse,
 			}
 
@@ -80,7 +78,7 @@ func APICall(image string, context string) string {
 
 	// Prepare request body
 	requestBody := map[string]interface{}{
-		"model": "gpt-4-vision-preview",
+		"model": "gpt-4o",
 		"messages": []map[string]interface{}{
 			{
 				"role": "user",
@@ -112,8 +110,12 @@ func APICall(image string, context string) string {
 	}
 
 	// Add headers
+	key := getAPIKey()
+	if key == "-1" {
+		return "Error getting API key"
+	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("OPENAI_API_KEY"))
+	req.Header.Set("Authorization", "Bearer "+key)
 
 	// Make request
 	resp, err := client.Do(req)
@@ -140,4 +142,27 @@ func APICall(image string, context string) string {
 	}
 
 	return "Error processing response"
+}
+
+func getAPIKey() string {
+	apiKey := os.Getenv("OPENAI_API_KEY")
+	if apiKey == "" {
+		// Try to read from .env file
+		content, err := os.ReadFile(".env")
+		if err == nil {
+			lines := strings.Split(string(content), "\n")
+			for _, line := range lines {
+				if strings.HasPrefix(line, "OPENAI_API_KEY=") {
+					apiKey = strings.TrimPrefix(line, "OPENAI_API_KEY=")
+					apiKey = strings.TrimSpace(apiKey)
+					break
+				}
+			}
+		}
+	}
+	if apiKey == "" {
+		log.Println("OPENAI_API_KEY is required in environment or .env file")
+		return "-1"
+	}
+	return apiKey
 }
