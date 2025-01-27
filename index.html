@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <style>
+        .loading {
+            display: none;
+            color: #666;
+            margin: 20px 0;
+        }
+        #responseArea {
+            width: 100%;
+            min-height: 150px;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <h1>Home</h1>
+    <p>Welcome to the ai sports analytics.</p>
+    <form id="uploadForm">
+        <input type="file" name="image" accept="image/*">
+        <button type="submit">Upload Image</button>
+        <br>
+        <input type="text" name="context-ai" placeholder="Give some context to the AI" required>
+    </form>
+    <div class="loading" id="loadingText">Processing image, please wait...</div>
+    <textarea id="responseArea" readonly placeholder="API response will appear here"></textarea>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loadingText = document.getElementById('loadingText');
+            const responseArea = document.getElementById('responseArea');
+            
+            loadingText.style.display = 'block';
+            responseArea.value = '';
+            
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                responseArea.value = data.api_response; // Display only API response
+            } catch (error) {
+                responseArea.value = 'Error: ' + error.message;
+            } finally {
+                loadingText.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
