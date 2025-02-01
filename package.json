@@ -1,0 +1,11 @@
+{
+  "name": "nemea-ai-sports-analytics",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently \"cd server && go run main.go\" \"cd client && npm run dev\"",
+    "install-deps": "cd client && npm install && npm install -D concurrently"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
