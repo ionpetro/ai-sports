@@ -1,1 +1,1 @@
-ai sports analytics
+Nemea ai sports analytics

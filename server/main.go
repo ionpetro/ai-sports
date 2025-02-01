@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"fmt"
 	"strings"
 )
 
@@ -130,6 +131,7 @@ func APICall(image string, context string) string {
 		return "Error reading response: " + err.Error()
 	}
 
+	fmt.Println(result)
 	// Extract response text
 	if choices, ok := result["choices"].([]interface{}); ok && len(choices) > 0 {
 		if choice, ok := choices[0].(map[string]interface{}); ok {
